@@ -9,10 +9,10 @@ class UserManager(BaseUserManager):
 
     def create_user(self, uprn, name, email=None, password=None, **extra_fields):
         """
-        Create and save a regular User with UPRN as the login field
+        Create and save a regular User with College ID as the login field
         """
         if not uprn:
-            raise ValueError("The UPRN must be set")
+            raise ValueError("The College ID must be set")
         email = self.normalize_email(email)
         user = self.model(uprn=uprn, name=name, email=email, **extra_fields)
         user.set_password(password)
@@ -21,7 +21,7 @@ class UserManager(BaseUserManager):
 
     def create_superuser(self, uprn, name, email=None, password=None, **extra_fields):
         """
-        Create and save a SuperUser with UPRN as the login field
+        Create and save a SuperUser with College ID as the login field
         """
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
@@ -37,10 +37,13 @@ class UserManager(BaseUserManager):
 class User(AbstractUser):
     """
     Custom User model extending Django's AbstractUser
-    Uses UPRN as the username field
+    Uses College ID as the username field
     """
     uprn = models.CharField(
-        max_length=20, unique=True, help_text="University Personal Registration Number"
+        max_length=20,
+        unique=True,
+        verbose_name="College ID",
+        help_text="College ID (used as the username)"
     )
     name = models.CharField(max_length=100, help_text="Full name of the user")
 

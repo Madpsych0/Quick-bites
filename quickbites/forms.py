@@ -47,9 +47,9 @@ class UserRegistrationForm(UserCreationForm):
 
 class UserLoginForm(forms.Form):
     """
-    Custom login form using UPRN and password
+    Custom login form using College ID and password
     """
-    uprn = forms.CharField(
+    uprn = forms.CharField,
         max_length=20,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
