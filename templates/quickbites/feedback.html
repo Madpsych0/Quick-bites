@@ -1,0 +1,182 @@
+{% extends 'quickbites/base.html' %}
+
+{% block title %}Feedback - QuickBites{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="row mb-5">
+        <div class="col text-center">
+            <h1 class="display-6 fw-bold mb-2" style="color: var(--primary-color);">
+                <i class="fas fa-comments me-2"></i>We Value Your Feedback
+            </h1>
+            <p class="lead text-muted">Help us improve your dining experience</p>
+        </div>
+    </div>
+    
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Feedback Form -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-star me-2" style="color: var(--secondary-color);"></i>
+                        Share Your Experience
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <label for="{{ form.subject.id_for_label }}" class="form-label fw-bold">Subject</label>
+                            {{ form.subject }}
+                            {% if form.subject.errors %}
+                                <div class="text-danger small mt-1">{{ form.subject.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="{{ form.rating.id_for_label }}" class="form-label fw-bold">Rating</label>
+                            <div class="rating-container mb-2">
+                                <div class="star-rating">
+                                    {% for i in "12345" %}
+                                        <i class="fas fa-star star" data-rating="{{ i }}"></i>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {{ form.rating }}
+                            {% if form.rating.errors %}
+                                <div class="text-danger small mt-1">{{ form.rating.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="{{ form.message.id_for_label }}" class="form-label fw-bold">Your Feedback</label>
+                            {{ form.message }}
+                            {% if form.message.errors %}
+                                <div class="text-danger small mt-1">{{ form.message.errors.0 }}</div>
+                            {% endif %}
+                            <div class="form-text">Please share your thoughts about our food, service, or any suggestions for improvement.</div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'menu' %}" class="btn btn-outline-secondary me-md-2">
+                                <i class="fas fa-arrow-left me-1"></i>Back to Menu
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-1"></i>Submit Feedback
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Feedback Guidelines -->
+            <div class="card mt-4 border-0" style="background-color: #f8f9fa;">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3">
+                        <i class="fas fa-lightbulb me-2" style="color: var(--accent-color);"></i>
+                        Feedback Guidelines
+                    </h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled small">
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Be specific about your experience</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Mention food quality and service</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Suggest improvements if any</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled small">
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Rate honestly based on your experience</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Help us serve you better</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Your feedback is anonymous</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contact Info -->
+            <div class="card mt-4">
+                <div class="card-body text-center">
+                    <h6 class="fw-bold mb-3">Need Immediate Assistance?</h6>
+                    <p class="text-muted mb-3">For urgent matters, you can also reach us directly:</p>
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <i class="fas fa-phone me-2" style="color: var(--primary-color);"></i>
+                            <strong>Call:</strong> +91 98765 43210
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <i class="fas fa-envelope me-2" style="color: var(--primary-color);"></i>
+                            <strong>Email:</strong> support@quickbites.com
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.star-rating {
+    font-size: 1.5rem;
+    color: #ddd;
+    cursor: pointer;
+}
+
+.star-rating .star {
+    transition: color 0.2s;
+}
+
+.star-rating .star:hover,
+.star-rating .star.active {
+    color: #ffc107;
+}
+
+#id_rating {
+    display: none;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Star rating functionality
+    var currentRating = {{ form.rating.value|default:5 }};
+    
+    // Initialize stars based on current rating
+    updateStars(currentRating);
+    $('#id_rating').val(currentRating);
+    
+    $('.star').click(function() {
+        currentRating = $(this).data('rating');
+        updateStars(currentRating);
+        $('#id_rating').val(currentRating);
+    });
+    
+    $('.star').hover(function() {
+        var hoverRating = $(this).data('rating');
+        updateStars(hoverRating);
+    }, function() {
+        updateStars(currentRating);
+    });
+    
+    function updateStars(rating) {
+        $('.star').each(function() {
+            var starRating = $(this).data('rating');
+            if (starRating <= rating) {
+                $(this).addClass('active');
+            } else {
+                $(this).removeClass('active');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

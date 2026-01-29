@@ -1,0 +1,160 @@
+{% extends 'quickbites/base.html' %}
+
+{% block title %}Payment - QuickBites{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Payment gateway mockup with order summary -->
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-gradient text-white text-center py-4">
+                    <h2 class="mb-0">
+                        <i class="fas fa-credit-card me-2"></i>
+                        Secure Payment Gateway
+                    </h2>
+                    <p class="mb-0 opacity-75">Complete your order securely</p>
+                </div>
+                
+                <div class="card-body p-4">
+                    <!-- Order Summary -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4 class="text-primary mb-3">
+                                <i class="fas fa-receipt me-2"></i>Order Summary
+                            </h4>
+                            
+                            <div class="order-items mb-4">
+                                {% for item in cart_items %}
+                                <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                    <div>
+                                        <strong>{{ item.menu_item.name }}</strong>
+                                        <small class="text-muted d-block">Qty: {{ item.quantity }}</small>
+                                    </div>
+                                    <span class="fw-bold">₹{{ item.get_subtotal }}</span>
+                                </div>
+                                {% endfor %}
+                                
+                                <div class="d-flex justify-content-between align-items-center py-3 border-top">
+                                    <h5 class="mb-0">Total Amount:</h5>
+                                    <h4 class="text-success mb-0">₹{{ total }}</h4>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h4 class="text-primary mb-3">
+                                <i class="fas fa-lock me-2"></i>Payment Details
+                            </h4>
+                            
+                            <!-- Mockup Payment Form -->
+                            <form id="payment-form">
+                                <div class="mb-3">
+                                    <label class="form-label">Card Number</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="fas fa-credit-card"></i>
+                                        </span>
+                                        <input type="text" class="form-control" placeholder="1234 5678 9012 3456" 
+                                               value="1234 5678 9012 3456" readonly>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label class="form-label">Expiry Date</label>
+                                        <input type="text" class="form-control" placeholder="MM/YY" 
+                                               value="12/25" readonly>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label">CVV</label>
+                                        <input type="text" class="form-control" placeholder="123" 
+                                               value="123" readonly>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3 mt-3">
+                                    <label class="form-label">Cardholder Name</label>
+                                    <input type="text" class="form-control" placeholder="John Doe" 
+                                           value="{{ user.name }}" readonly>
+                                </div>
+                                
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Demo Mode:</strong> This is a mockup payment gateway for demonstration purposes.
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Actions -->
+                    <div class="text-center mt-4">
+                        <form method="post" action="{% url 'process_payment' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success btn-lg px-5 me-3">
+                                <i class="fas fa-lock me-2"></i>
+                                Pay ₹{{ total }} Securely
+                            </button>
+                        </form>
+                        
+                        <a href="{% url 'cart' %}" class="btn btn-outline-secondary btn-lg px-4 mt-2">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Back to Cart
+                        </a>
+                    </div>
+                    
+                    <!-- Security Features -->
+                    <div class="row mt-4 text-center">
+                        <div class="col-4">
+                            <i class="fas fa-shield-alt text-success fa-2x mb-2"></i>
+                            <small class="d-block text-muted">SSL Encrypted</small>
+                        </div>
+                        <div class="col-4">
+                            <i class="fas fa-lock text-success fa-2x mb-2"></i>
+                            <small class="d-block text-muted">Secure Payment</small>
+                        </div>
+                        <div class="col-4">
+                            <i class="fas fa-check-circle text-success fa-2x mb-2"></i>
+                            <small class="d-block text-muted">Verified Gateway</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.bg-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.order-items {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.card {
+    border-radius: 15px;
+}
+
+.card-header {
+    border-radius: 15px 15px 0 0 !important;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border: none;
+    border-radius: 50px;
+    transition: transform 0.2s;
+}
+
+.btn-success:hover {
+    transform: translateY(-2px);
+}
+
+.btn-outline-secondary {
+    border-radius: 50px;
+}
+</style>
+{% endblock %}

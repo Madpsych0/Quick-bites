@@ -1,0 +1,108 @@
+{% extends 'quickbites/base.html' %}
+
+{% block title %}Payment Successful - QuickBites{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <!-- Payment confirmation with ticket redirect -->
+            <div class="card shadow-lg border-0 text-center">
+                <div class="card-body p-5">
+                    <div class="success-icon mb-4">
+                        <i class="fas fa-check-circle text-success" style="font-size: 5rem;"></i>
+                    </div>
+                    
+                    <h2 class="text-success mb-3">Payment Confirmed!</h2>
+                    <p class="lead text-muted mb-4">
+                        Your order has been successfully placed and payment confirmed.
+                    </p>
+                    
+                    <div class="order-details bg-light p-4 rounded mb-4">
+                        <h5 class="text-primary mb-3">Order Details</h5>
+                        <div class="row">
+                            <div class="col-6 text-start">
+                                <strong>Order ID:</strong>
+                            </div>
+                            <div class="col-6 text-end">
+                                <code>{{ order.id|truncatechars:8 }}</code>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 text-start">
+                                <strong>Total Amount:</strong>
+                            </div>
+                            <div class="col-6 text-end">
+                                <strong class="text-success">₹{{ order.total_amount }}</strong>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 text-start">
+                                <strong>Status:</strong>
+                            </div>
+                            <div class="col-6 text-end">
+                                <span class="badge bg-success">{{ order.get_status_display }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-utensils me-2"></i>
+                        <strong>Collect your order from canteen counters</strong>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'ticket' order.id %}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-ticket-alt me-2"></i>
+                            Show Your Ticket
+                        </a>
+                        
+                        <a href="{% url 'menu' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-utensils me-2"></i>
+                            Order More Items
+                        </a>
+                        
+                        <a href="{% url 'profile' %}" class="btn btn-outline-info">
+                            <i class="fas fa-user me-2"></i>
+                            View All Orders
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    border-radius: 20px;
+    animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 50px;
+    transition: transform 0.2s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+}
+
+.btn-outline-secondary, .btn-outline-info {
+    border-radius: 50px;
+}
+</style>
+{% endblock %}

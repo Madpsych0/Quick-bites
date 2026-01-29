@@ -1,0 +1,98 @@
+{% extends 'quickbites/base.html' %}
+
+{% block title %}Customer Support - QuickBites{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Added subtle animations for customer support page */
+    .support-container {
+        animation: fadeInUp 0.8s ease-out;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .support-card {
+        transition: all 0.3s ease;
+    }
+    
+    .support-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5 support-container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card support-card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-headset me-2"></i>Customer Support
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <p class="lead">We're here to help! Share your feedback, report issues, or ask questions.</p>
+                    
+                    <form method="post" class="mt-4">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.subject.id_for_label }}" class="form-label">Subject</label>
+                            {{ form.subject }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.message.id_for_label }}" class="form-label">Message</label>
+                            {{ form.message }}
+                        </div>
+                        
+                        <!-- Removed rating field as requested -->
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-paper-plane me-2"></i>Submit
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Quick Help Section -->
+            <div class="row mt-4">
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100 support-card">
+                        <div class="card-body text-center">
+                            <i class="fas fa-clock fa-3x text-primary mb-3"></i>
+                            <h5>Operating Hours</h5>
+                            <p>Monday - Friday<br>8:00 AM - 6:00 PM</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100 support-card">
+                        <div class="card-body text-center">
+                            <i class="fas fa-phone fa-3x text-primary mb-3"></i>
+                            <h5>Emergency Contact</h5>
+                            <p>Canteen Counter<br>+91 12345 67890</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+{% endblock %}

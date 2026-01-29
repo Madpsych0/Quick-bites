@@ -1,0 +1,378 @@
+{% extends 'quickbites/base.html' %}
+
+{% block title %}Digital Ticket - QuickBites{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <!-- Digital ticket with QR code -->
+            <div class="ticket-container">
+                <div class="ticket-header">
+                    <div class="brand-section">
+                        <h2 class="brand-title">QuickBites</h2>
+                        <p class="tagline">Digital Order Ticket</p>
+                    </div>
+                    
+                    <div class="ticket-status">
+                        {% if order.is_redeemed %}
+                            <span class="status-badge redeemed">
+                                <i class="fas fa-check-circle me-1"></i>REDEEMED
+                            </span>
+                        {% else %}
+                            <span class="status-badge active">
+                                <i class="fas fa-clock me-1"></i>ACTIVE
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="ticket-body">
+                    <!-- Order Information -->
+                    <div class="order-info mb-4">
+                        <div class="info-row">
+                            <span class="label">Order ID:</span>
+                            <span class="value">{{ order.id|truncatechars:12 }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Customer:</span>
+                            <span class="value">{{ order.user.name }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">UPRN:</span>
+                            <span class="value">{{ order.user.uprn }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Date & Time:</span>
+                            <span class="value">{{ order.created_at|date:"M d, Y H:i" }}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Order Items -->
+                    <div class="order-items mb-4">
+                        <h5 class="section-title">
+                            <i class="fas fa-utensils me-2"></i>Order Details
+                        </h5>
+                        
+                        {% for item in order_items %}
+                        <div class="item-row">
+                            <div class="item-info">
+                                <span class="item-name">{{ item.menu_item.name }}</span>
+                                <span class="item-qty">x{{ item.quantity }}</span>
+                            </div>
+                            <span class="item-price">₹{{ item.get_subtotal }}</span>
+                        </div>
+                        {% endfor %}
+                        
+                        <div class="total-row">
+                            <span class="total-label">Total Amount:</span>
+                            <span class="total-amount">₹{{ order.total_amount }}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- QR Code Section -->
+                    <div class="qr-section text-center">
+                        <h5 class="section-title mb-3">
+                            <i class="fas fa-qrcode me-2"></i>Scan to Redeem
+                        </h5>
+                        
+                        {% if order.qr_code %}
+                        <div class="qr-code-container">
+                            <img src="data:image/png;base64,{{ order.qr_code }}" 
+                                 alt="Order QR Code" class="qr-code">
+                        </div>
+                        {% endif %}
+                        
+                        <p class="qr-instructions">
+                            Show this QR code to canteen staff to collect your order
+                        </p>
+                        
+                        {% if order.is_redeemed %}
+                        <div class="redeemed-info">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <small class="text-muted">
+                                Redeemed on {{ order.redeemed_at|date:"M d, Y H:i" }}
+                            </small>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="ticket-footer">
+                    <div class="footer-actions">
+                        <a href="{% url 'profile' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Profile
+                        </a>
+                        
+                        {% if not order.is_redeemed %}
+                        <button onclick="window.print()" class="btn btn-secondary">
+                            <i class="fas fa-print me-2"></i>Print Ticket
+                        </button>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="footer-note">
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Keep this ticket until order collection
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.ticket-container {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    overflow: hidden;
+    border: 2px dashed #e0e0e0;
+    position: relative;
+}
+
+.ticket-container::before,
+.ticket-container::after {
+    content: '';
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background: #f8f9fa;
+    border-radius: 50%;
+    left: -15px;
+    z-index: 1;
+}
+
+.ticket-container::before {
+    top: 40%;
+}
+
+.ticket-container::after {
+    right: -15px;
+    left: auto;
+    top: 40%;
+}
+
+.ticket-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.brand-title {
+    font-family: 'Modak', cursive;
+    font-size: 2rem;
+    margin: 0;
+}
+
+.tagline {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 0.9rem;
+}
+
+.status-badge {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+
+.status-badge.active {
+    background: rgba(40, 167, 69, 0.2);
+    color: #28a745;
+    border: 2px solid rgba(40, 167, 69, 0.3);
+}
+
+.status-badge.redeemed {
+    background: rgba(108, 117, 125, 0.2);
+    color: #6c757d;
+    border: 2px solid rgba(108, 117, 125, 0.3);
+}
+
+.ticket-body {
+    padding: 30px;
+}
+
+.section-title {
+    color: #667eea;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.info-row, .item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.info-row:last-child, .item-row:last-child {
+    border-bottom: none;
+}
+
+.label {
+    font-weight: 500;
+    color: #666;
+}
+
+.value {
+    font-weight: 600;
+    color: #333;
+}
+
+.item-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.item-name {
+    font-weight: 600;
+    color: #333;
+}
+
+.item-qty {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.item-price {
+    font-weight: 600;
+    color: #28a745;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0 0 0;
+    border-top: 2px solid #667eea;
+    margin-top: 15px;
+}
+
+.total-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.total-amount {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #28a745;
+}
+
+.qr-code-container {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    display: inline-block;
+    margin-bottom: 15px;
+}
+
+.qr-code {
+    width: 200px;
+    height: 200px;
+    border-radius: 10px;
+}
+
+.qr-instructions {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+}
+
+.redeemed-info {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 10px;
+    margin-top: 15px;
+}
+
+.ticket-footer {
+    background: #f8f9fa;
+    padding: 20px 30px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.footer-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.footer-note {
+    text-align: center;
+}
+
+.btn {
+    border-radius: 25px;
+    padding: 8px 20px;
+    font-weight: 500;
+}
+
+.btn-outline-primary {
+    border-color: #667eea;
+    color: #667eea;
+}
+
+.btn-outline-primary:hover {
+    background: #667eea;
+    border-color: #667eea;
+}
+
+/* Print styles */
+@media print {
+    .ticket-container {
+        box-shadow: none;
+        border: 1px solid #ccc;
+    }
+    
+    .footer-actions {
+        display: none;
+    }
+    
+    body * {
+        visibility: hidden;
+    }
+    
+    .ticket-container, .ticket-container * {
+        visibility: visible;
+    }
+    
+    .ticket-container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .ticket-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+    
+    .footer-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .qr-code {
+        width: 150px;
+        height: 150px;
+    }
+}
+</style>
+{% endblock %}

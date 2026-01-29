@@ -1,0 +1,210 @@
+{% extends 'quickbites/base.html' %}
+
+{% block title %}Menu - QuickBites{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Added animations for menu items */
+    .menu-section {
+        animation: fadeInUp 0.8s ease-out;
+    }
+    
+    .food-item-card {
+        transition: all 0.3s ease;
+        animation: slideInUp 0.6s ease-out;
+    }
+    
+    .food-item-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .add-to-cart-btn {
+        transition: all 0.3s ease;
+    }
+    
+    .add-to-cart-btn:hover {
+        transform: scale(1.05);
+    }
+    
+    .welcome-header {
+        animation: bounceIn 1s ease-out;
+    }
+    
+    @keyframes bounceIn {
+        0% {
+            opacity: 0;
+            transform: scale(0.3);
+        }
+        50% {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+        70% {
+            transform: scale(0.9);
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <form style="display:none;">
+    {% csrf_token %}
+    </form>
+
+    <!-- Added animation class to welcome header -->
+    <div class="row mb-5 welcome-header">
+        <div class="col text-center">
+            <h1 class="display-5 fw-bold mb-2">Welcome {{ user_name }}!</h1>
+            <p class="lead text-muted">What would you like to order today?</p>
+        </div>
+    </div>
+    
+    <!-- Menu Categories -->
+    {% for category, items in menu_by_category.items %}
+    <section class="mb-5 menu-section">
+        <div class="row mb-4">
+            <div class="col">
+                <h2 class="fw-bold text-capitalize" style="color: var(--primary-color);">
+                    <i class="fas fa-{% if category == 'breakfast' %}coffee{% elif category == 'lunch' %}hamburger{% elif category == 'beverage' %}glass-water{% elif category == 'special' %}star{% else %}tags{% endif %} me-2"></i>
+                    {{ category|title }}
+                    {% if category == 'special' %} - Today's Special{% endif %}
+                </h2>
+                <hr style="border-color: var(--primary-color); border-width: 2px;">
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            {% for item in items %}
+            <div class="col-lg-4 col-md-6">
+                <div class="card food-item-card h-100 shadow-sm">
+                    {% if item.image %}
+                        <img src="{{ item.image.url }}" class="card-img-top food-item-image" alt="{{ item.name }}">
+                    {% else %}
+                        <div class="card-img-top food-item-image bg-light d-flex align-items-center justify-content-center">
+                            <i class="fas fa-utensils fa-3x text-muted"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title fw-bold">{{ item.name }}</h5>
+                        {% if item.description %}
+                            <p class="card-text text-muted small">{{ item.description }}</p>
+                        {% endif %}
+                        <div class="mt-auto">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="h5 mb-0 fw-bold" style="color: var(--primary-color);">₹{{ item.price }}</span>
+                                <button class="btn btn-primary btn-sm add-to-cart-btn" data-item-id="{{ item.id }}">
+                                    <i class="fas fa-plus me-1"></i>Add to Cart
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle me-2"></i>
+                    No items available in {{ category|title }} category at the moment.
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% empty %}
+    <div class="row">
+        <div class="col text-center">
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                No menu items are currently available. Please check back later!
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Cart notification toast -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="cartToast" class="toast" role="alert">
+        <div class="toast-header">
+            <i class="fas fa-shopping-cart text-primary me-2"></i>
+            <strong class="me-auto">Cart Updated</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="toastMessage">
+            Item added to cart successfully!
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    $('.add-to-cart-btn').click(function() {
+        var itemId = $(this).data('item-id');
+        var button = $(this);
+        
+        // Disable button and show loading
+        button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Adding...');
+        
+        $.ajax({
+            url: '/add-to-cart/' + itemId + '/',
+            type: 'POST',
+            data: {
+                'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val()
+            },
+            success: function(response) {
+                if (response.success) {
+                    // Show success toast
+                    $('#toastMessage').text(response.message);
+                    var toast = new bootstrap.Toast(document.getElementById('cartToast'));
+                    toast.show();
+                    
+                    updateCartCount();
+                    
+                    // Reset button
+                    button.prop('disabled', false).html('<i class="fas fa-plus me-1"></i>Add to Cart');
+                } else {
+                    alert('Error adding item to cart');
+                    button.prop('disabled', false).html('<i class="fas fa-plus me-1"></i>Add to Cart');
+                }
+            },
+            error: function() {
+                alert('Error adding item to cart');
+                button.prop('disabled', false).html('<i class="fas fa-plus me-1"></i>Add to Cart');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

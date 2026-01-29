@@ -1,0 +1,124 @@
+{% extends 'quickbites/base.html' %}
+
+{% block title %}My Profile - QuickBites{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- User profile with order history -->
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-gradient text-white py-4">
+                    <div class="d-flex align-items-center">
+                        <div class="avatar-circle me-3">
+                            <i class="fas fa-user fa-2x"></i>
+                        </div>
+                        <div>
+                            <h3 class="mb-1">{{ user.name }}</h3>
+                            <p class="mb-0 opacity-75">UPRN: {{ user.uprn }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-body p-4">
+                    <h4 class="text-primary mb-4">
+                        <i class="fas fa-history me-2"></i>Order History
+                    </h4>
+                    
+                    {% if orders %}
+                        <div class="order-list">
+                            {% for order in orders %}
+                            <div class="order-card mb-3 p-3 border rounded">
+                                <div class="row align-items-center">
+                                    <div class="col-md-3">
+                                        <small class="text-muted">Order ID</small>
+                                        <div class="fw-bold">
+                                            <code>{{ order.id|truncatechars:8 }}</code>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-2">
+                                        <small class="text-muted">Amount</small>
+                                        <div class="fw-bold text-success">₹{{ order.total_amount }}</div>
+                                    </div>
+                                    
+                                    <div class="col-md-2">
+                                        <small class="text-muted">Status</small>
+                                        <div>
+                                            {% if order.is_redeemed %}
+                                                <span class="badge bg-success">Completed</span>
+                                            {% else %}
+                                                <span class="badge bg-warning">Pending</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-3">
+                                        <small class="text-muted">Date</small>
+                                        <div>{{ order.created_at|date:"M d, Y H:i" }}</div>
+                                    </div>
+                                    
+                                    <div class="col-md-2">
+                                        {% if not order.is_redeemed %}
+                                            <a href="{% url 'ticket' order.id %}" class="btn btn-sm btn-primary">
+                                                <i class="fas fa-ticket-alt me-1"></i>Ticket
+                                            </a>
+                                        {% else %}
+                                            <span class="text-muted">
+                                                <i class="fas fa-check-circle me-1"></i>Redeemed
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-shopping-cart text-muted" style="font-size: 4rem;"></i>
+                            <h5 class="text-muted mt-3">No orders yet</h5>
+                            <p class="text-muted">Start ordering delicious food from our menu!</p>
+                            <a href="{% url 'menu' %}" class="btn btn-primary">
+                                <i class="fas fa-utensils me-2"></i>Browse Menu
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.bg-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.avatar-circle {
+    width: 60px;
+    height: 60px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.order-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.order-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.card {
+    border-radius: 15px;
+}
+
+.card-header {
+    border-radius: 15px 15px 0 0 !important;
+}
+</style>
+{% endblock %}
