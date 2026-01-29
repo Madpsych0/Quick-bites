@@ -18,7 +18,7 @@ class UserRegistrationForm(UserCreationForm):
         max_length=9,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Enter your UPRN'
+            'placeholder': 'Enter your College ID'
         })
     )
     password1 = forms.CharField(
@@ -53,7 +53,7 @@ class UserLoginForm(forms.Form):
         max_length=20,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Enter your UPRN'
+            'placeholder': 'Enter your College ID'
         })
     )
     password = forms.CharField(
@@ -71,7 +71,7 @@ class UserLoginForm(forms.Form):
         if uprn and password:
             user = authenticate(username=uprn, password=password)
             if not user:
-                raise forms.ValidationError("Invalid UPRN or password.")
+                raise forms.ValidationError("Invalid College ID or password.")
             if not user.is_active:
                 raise forms.ValidationError("This account is inactive.")
         

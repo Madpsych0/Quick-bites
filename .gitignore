@@ -10,7 +10,6 @@ db.sqlite3
 /media/
 *.sqlite3
 *.log
-.env
 
 # VS Code
 .vscode/
