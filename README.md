@@ -1,4 +1,3 @@
-
 # Quick Bites
 
 A college cafeteria based item pre-order solution which provides students the capability to pre-order items beforehand.
@@ -130,5 +129,5 @@ py scanner_manage.py runserver 8001
 
 - [@Madpsycho](https://www.github.com/Madpsych0)
 - [@theaxlee](https://github.com/theaxlee)
-- [@Scariya]
+- [@Scaria6](https://github.com/Scaria6)
 
