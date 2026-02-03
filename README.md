@@ -124,3 +124,8 @@ py scanner_manage.py runserver 8001
 ## Notes
 - SQLite is used by default; update `DATABASE_URL` for PostgreSQL/MySQL if needed.
 - These steps are intended for **local development**, not production deployment.
+
+## Author
+- [@Madpsycho](https://www.github.com/Madpsych0)
+- [@theaxlee](https://github.com/theaxlee)
+- [@Scaria6](https://github.com/Scaria6)
